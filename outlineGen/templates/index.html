@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlotPlanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'DM', sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        h1 {
+            margin: 0.5em 0;
+            font-size: 4.5rem;
+        }
+        p {
+            margin: 0.5em 0;
+            font-size: 1.5rem;
+        }
+        img {
+            max-height: 20%; /* Limit image size */
+            margin: 0.5em 0;
+        }
+        .btn-begin {
+            background-color: #c776e7;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            text-decoration: none;
+            margin: 0.5em 0;
+        }
+        .btn-begin:hover {
+            background-color: #b565a7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PlotPlanner</h1>
+        <p>Your Outline Assistant</p> 
+        <img src="{{ url_for( 'static' , filename = 'icons8-black-nib-48.png') }}">
+        <a href="/form" class="btn-begin">Begin</a>
+    </div>
+</body>
+</html>

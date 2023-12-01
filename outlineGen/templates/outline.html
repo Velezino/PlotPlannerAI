@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+   
+    <!-- Bootstrap CSS and other head elements -->
+    <title>Outline</title>
+    <style>
+/* Carousel Container */
+.carousel-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers vertically in the container */
+    align-items: center; /* Centers horizontally in the container */
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+}
+
+.pyramid-form {
+    text-align: center;
+    padding: 30px;
+    background-color: transparent;
+    margin: auto;
+    width: 60%; /* This can be adjusted to fit the content */
+    height: auto; /* Adjust height to content */
+    display: none; /* If you want it to not be a flex item */
+}
+/* Optionally, you can add a class to the first form to make it visible */
+.pyramid-form.first {
+    display: block;
+}
+
+.expandable-textarea {
+    width: 100%; /* Full width of the pyramid-form */
+    height: 300px; /* Height adjusted to content */
+    resize: none; /* No resizing */
+    /* Rest of your styles */
+}
+
+/* Ensure the body has no additional padding or margin that could offset the layout */
+body, html {
+    background: linear-gradient(to top, #000000, white); /* Gradient from black to lighter grey */
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents scrolling */
+}
+
+
+.form-label {
+    font-size: 22px;
+  
+    color: rgb(0, 0, 0); /* or any color that stands out against your background */
+    /* other styles */
+}
+
+
+    /* Carousel Navigation Buttons */
+#left-arrow, #right-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 1000;
+    font-size: 24px; /* Larger arrow size */
+    color: #fff; /* Change the color as needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    border-radius: 50%; /* Circular shape */
+    width: 40px; /* Fixed width */
+    height: 40px; /* Fixed height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transitions for hover effects */
+}
+
+#left-arrow {
+    left: 10px;
+}
+
+#right-arrow {
+    right: 10px;
+}
+
+#left-arrow:hover, #right-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.7); /* Darker background on hover */
+    transform: translateY(-50%) scale(1.1); /* Slightly larger on hover */
+}
+
+
+        .btn-outline-secondary {
+            font-family: robo;
+            background-color: black; /* Match color from index.html */
+            color: white;
+            font-size: 16px; /* Increase font size */
+            padding: 6px 12px; /* Increase padding */
+            border: none; /* Remove border */
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #c776e7; /* Darker color for hover */
+            color: #776e77;
+}
+
+        .copy-btn {
+            background-color: transparent;
+            color: white;
+            border: none;
+            padding: 2px;
+            margin-left: 3px;
+            cursor: pointer;
+            font-size: 1.5rem; /* Increased font size for icon */
+        }
+        .copy-btn:hover {
+            background-color: #b565a7;
+        }
+
+        #start-over-btn {
+            position: absolute;
+            top: 10px; /* Adjust as needed */
+            right: 7px; /* Adjust as needed */
+            text-decoration: none; /* Optional: Removes underline from the link */
+            background-color: #c776e7; /* Match color from index.html */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-style: normal;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif ;
+        }
+        #start-over-btn:hover {
+            background-color: #b565a7; /* Darker color for hover */
+        }   
+    </style>
+</head>
+<body>
+    <!-- Carousel Forms -->
+    <div class="carousel-container">
+        {% for part in session['outline_parts'] %}
+            <div class="pyramid-form" id="form{{ loop            .index }}">
+                <form action="{{ url_for('ai_modify') }}" method="post">
+                    <label for="outlinePart{{ loop.index }}" class="form-label">Part {{ loop.index }}</label>
+                    <div class="input-group mb-3">
+                        <textarea class="form-control expandable-textarea" id="outlinePart{{ loop.index }}" name="modsentence">{{ part }}</textarea>
+                        <button type="button" class="copy-btn" onclick="copyToClipboard('outlinePart{{ loop.index }}')">
+                            <i class="fas fa-clipboard"></i>
+                        </button>
+                        <input type="hidden" name="sentence" value="{{ loop.index }}">
+                        <button class="btn btn-outline-secondary" type="submit">More</button>
+                    </div>                
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Start Over Button -->
+    <a href="/" id="start-over-btn">Start Over</a>
+
+    <!-- Navigation Buttons -->
+    <button id="left-arrow">&#8592;</button>
+    <button id="right-arrow">&#8594;</button>
+
+    <!-- JavaScript for Carousel Functionality -->
+    <script>
+        let currentIndex = 0;
+        const forms = document.querySelectorAll('.pyramid-form');
+        const totalForms = forms.length;
+        forms[currentIndex].style.display = 'block'; // Show the first form initially
+
+        function showForm(index) {
+            forms.forEach(form => form.style.display = 'none');
+            forms[index].style.display = 'block';
+        }
+
+        document.getElementById('left-arrow').addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + totalForms) % totalForms;
+            showForm(currentIndex);
+        });
+
+        document.getElementById('right-arrow').addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % totalForms;
+            showForm(currentIndex);
+        });
+
+        // Copy to Clipboard Function
+        function copyToClipboard(elementId) {
+            var copyText = document.getElementById(elementId);
+            copyText.select(); // Selects the text inside the textarea
+            copyText.setSelectionRange(0, 99999); // For mobile devices
+
+            // Copy the selected text to clipboard
+            navigator.clipboard.writeText(copyText.value)
+                .then(() => {
+                    alert("Copied to clipboard");
+                })
+                .catch(err => {
+                    console.log('Something went wrong', err);
+                })
+        }
+    </script>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+</body>
+</html>
+
